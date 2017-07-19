@@ -1,0 +1,33 @@
+cd /danl/SB/${n}/anatomical/
+
+#make new folder
+
+mkdir DTI/
+
+#convert dicom to nifti 
+
+dcm2nii -o ./DTI -e y /danl/SB/${n}/anatomical/PING*/
+
+cd /danl/SB/${n}/anatomical/DTI/
+
+#rename outputs 
+
+mv *.nii.gz ${n}_dwi.nii.gz
+
+mv *.bval ${n}_bvals 
+
+mv *.bvec ${n}_bvecs
+
+#extract b0 image
+
+fslroi *.nii.gz ${n}_b0_AP 0 1
+
+#brain extraction, create mask 
+
+bet ${n}_b0_AP ${n}_brain -m -f 0.3
+
+
+echo ${n}
+
+end 
+
