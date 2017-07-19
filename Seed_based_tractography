@@ -1,0 +1,30 @@
+#!/bin/tcsh
+
+cd /danl/SB/${n}/anatomical/DTI
+
+mkdir ${n}_BEDPOSTX
+
+cp ${n}_bvals /danl/SB/${n}/anatomical/DTI/${n}_BEDPOSTX 
+cd ${n}_BEDPOSTX
+mv ${n}_bvals bvals
+
+cd ../
+cp ${n}_bvecs /danl/SB/${n}/anatomical/DTI/${n}_BEDPOSTX 
+cd ${n}_BEDPOSTX
+mv ${n}_bvecs bvecs
+
+cd ../
+cp ${n}_brain_mask.nii.gz /danl/SB/${n}/anatomical/DTI/${n}_BEDPOSTX 
+cd ${n}_BEDPOSTX
+mv ${n}_brain_mask.nii.gz nodif_brain_mask.nii.gz
+
+cd ../
+cp ${n}_eddycorrect.nii.gz /danl/SB/${n}/anatomical/DTI/${n}_BEDPOSTX
+cd ${n}_BEDPOSTX
+mv ${n}_eddycorrect.nii.gz data.nii.gz 
+
+
+
+bedpostx /danl/SB/${n}/anatomical/DTI/${n}_BEDPOSTX
+
+end
