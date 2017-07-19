@@ -1,3 +1,5 @@
+#!/bin/tcsh
+
 cd /danl/SB/${n}/anatomical/
 
 #make new folder
