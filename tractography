@@ -1,4 +1,6 @@
 
+# BEDPOSTX
+
 #!/bin/tcsh
 
 cd /danl/SB/${n}/anatomical/DTI
@@ -24,8 +26,14 @@ cp ${n}_eddycorrect.nii.gz /danl/SB/${n}/anatomical/DTI/${n}_BEDPOSTX
 cd ${n}_BEDPOSTX
 mv ${n}_eddycorrect.nii.gz data.nii.gz 
 
-
-
 bedpostx /danl/SB/${n}/anatomical/DTI/${n}_BEDPOSTX
 
 end
+
+
+#Registration FNIRT
+
+
+
+#PROBTRACKX 
+
