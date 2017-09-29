@@ -2,9 +2,9 @@
 
 #Cannot run topup because only have 1 direction 
 
-#run eddy  correction
+#run eddy  correction on habanero (using eddy_openmp becuase it is faster than eddy)
 
-eddy --imain=${n}_dwi.nii.gz --mask=${n}_brain_mask.nii.gz --index=index.txt --acqp=acqparamsAP_PA.txt --bvecs=${n}_bvecs --bvals=${n}_bvals --fwhm=0 --flm=quadratic --out=${n}_eddy
+eddy_openmp --imain=${n}_dwi.nii.gz --mask=${n}_brain_mask.nii.gz --index=index.txt --acqp=acqparamsAP_PA.txt --bvecs=${n}_bvecs --bvals=${n}_bvals --fwhm=0 --flm=quadratic --repol --dont_peas --out=${n}_eddy
 
 echo ${n} 
 
