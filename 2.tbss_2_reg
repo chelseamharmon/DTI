@@ -1,0 +1,16 @@
+#!/bin/sh
+
+#SBATCH --account=psych
+#SBATCH --job-name=tbss_2
+#SBATCH -c 1
+#SBATCH --time=24:30:00
+#SBATCH --mem-per-cpu=8gb
+
+n=$1
+n1=$1_fu1
+n2=$1_fu2
+
+cd /rigel/psych/users/cmh2228/SB/TBSS/
+
+tbss_2_reg -T
+echo ${n}
