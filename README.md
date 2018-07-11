@@ -93,7 +93,9 @@ for n in SB*; do sbatch autoptx1.sh $n; done
 ## run bedpostx 
 
 ```.bash
+for n in SB*; do sbatch 0.prepare_bedpostx_folders $n; done 
 
+for n in SB*; do sbatch 1.bedpostx $n; done
 #This script runs: bedpostx ${n}
 ```
 
@@ -104,6 +106,10 @@ for n in SB*; do sbatch 3.registration $n; done
 ```
 
 ## run probpostx 
+Using amydala as a seed 
+```.bash
+for n in SB*; do sbatch 4.probtrackxAmygSeed.sh $n; done 
 
+```
 
 
