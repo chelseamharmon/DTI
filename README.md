@@ -1,32 +1,109 @@
 # DTI
 SB DTI Pipeline
 
-##Preprocessing 
+## Preprocessing 
 
-##Brain extraction – extract b0 create mask 
+## Creating DTI folders and Converting dicoms to NIfti 
 
+```.bash 
+foreach n (SB002_fu2 SB018_fu2 SB019_fu2…)
+
+cd /danl/SB/${n}/anatomical/PING_30DIR_LONGTR_4/
+
+if (! -d DTI) then 
+	mkdir DTI/
+
+dcm2nii -o ./DTI -r N DICOM
+
+for i in $(ls); do dcm2nii -p y -f y ${i}/*; done;
+
+
+```
+
+## Brain extraction – extract b0 create mask 
+
+```.bash
 fslroi *.nii.gz ${n}_b0_AP 0 1
 bet ${n}_b0_AP ${n}_brain -m -f 0.3
 
 #cannot run topup becuase only 1 b0 image 
+```
 
-##run eddy 
+## run eddy 
 
+```.bash
+#IF not running on cluster - I did not do this 
 eddy --imain=${n}_dwi.nii.gz --mask=${n}_brain_mask.nii.gz --index=/danl/SB/DTI/index.txt --acqp=/danl/SB/DTI/acqparams.txt --bvec=${n}_bvecs --bvals=${n}_bvals /
 --fwhm=0 --flm=quadratic --dont_peas --repol --out=${n}_eddy
 
-eddy_openmp --imain=${n}_dwi.nii.gz --mask=${n}_brain_mask.nii.gz --index=/danl/SB/DTI/index.txt --acqp=/danl/SB/DTI/acqparams.txt --bvec=${n}_bvecs --bvals=${n}_bvals /
+#IF running on habanero 
+for i in SB*; do sbatch eddy_opemp_batch.sh $n; done 
+
+#This script rungs: eddy_openmp --imain=${n}_dwi.nii.gz --mask=${n}_brain_mask.nii.gz --index=/danl/SB/DTI/index.txt --acqp=/danl/SB/DTI/acqparams.txt --bvec=${n}_bvecs --bvals=${n}_bvals /
 --fwhm=0 --flm=quadratic --dont_peas --repol --out=${n}_eddy
+```
+
+## Fitting tensors 
+
+```.bash 
+
+dtifit -k eddy_unwarped_images -m hifi_nodif_brain_mask -r bvecs -b bvals -o dti 
+
+```
 
 ##check for motion 
 
-##autoptx??
 
-##run bedpostx 
+## TBSS 
+run on habanero 
 
-##subject registration?
+```.bash
+sbatch 0.prepare_tbss_folder 
+#This script creates one folder with all _dti_FA.nii.gz files and renames them to order by group (COMP/PI)
 
-##run probpostx 
+sbatch 1.tbss_1_preproc 
+#This script runs: tbss_1_preproc *nii.gz
+
+sbatch 2.tbss_2_reg
+#This script runs: tbss_2_reg -T
+
+sbatch 3.tbss_3_postreg 
+#This script runs: tbss_3_postreg -S
+
+sbatch 4.tbss_4_prestats
+#This script runs: tbss_4_prestats 0.2
+
+ ```
+
+## autoptx
+
+```.bash
+#prepare autoptx folder 
+sbatch 0.prepare_autoptx_folders
+
+for n in SB*; do sbatch autoptx1.sh $n; done 
+
+#This script runs: autoPtx_1_preproc ${n} 
+#and then: autoPtx_2_launchTractography 
+
+#done for "ar_l", "ar_r", "atr_l", "atr_r", "cgc_l", "cgc_r", "cgh_l", "cgh_r", "ifo_l", "ifo_r", "ilf_l", "ilf_r", "ptr_l", "ptr_r", "slf_l", "slf_r", "str_r", "str_l", "unc_l", "unc_r"
+
+```
+
+## run bedpostx 
+
+```.bash
+
+#This script runs: bedpostx ${n}
+```
+
+## subject registration
+```.bash
+for n in SB*; do sbatch 3.registration $n; done 
+
+```
+
+## run probpostx 
 
 
 
