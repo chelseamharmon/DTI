@@ -1,0 +1,14 @@
+#!/bin/sh
+
+#SBATCH --account=psych
+#SBATCH --job-name=autoptx
+#SBATCH -c 24
+#SBATCH --time=11:55:00
+#SBATCH --mem=120gb
+export PATH=$PATH:/rigel/psych/users/cmh2228/SB/autoPtx
+
+n=$1
+
+#/rigel/psych/users/cmh2228/SB/autoptx/autoPtx/autoPtx_1_preproc ${n}
+autoPtx_2_launchTractographySubList${n}
+
