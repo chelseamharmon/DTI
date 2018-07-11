@@ -1,0 +1,24 @@
+#!/bin/sh
+
+#SBATCH --account=psych
+#SBATCH --job-name=cpAutoPtx
+#SBATCH -c 1
+#SBATCH --time=00:05:00
+#SBATCH --mem-per-cpu=8gb
+
+# assign arguments to named variables
+n1=$1
+
+#make directory in autoptx folder for subject
+
+cd /rigel/psych/users/cmh2228/SB/autoptx/
+mkdir ${n1}
+
+# change to subject folder
+cd /rigel/psych/users/cmh2228/SB/${n1}/anatomical/DTI/BEDPOSTX
+
+#move to autoptx
+cp bvecs /rigel/psych/users/cmh2228/SB/autoptx/${n1}
+cp bvals /rigel/psych/users/cmh2228/SB/autoptx/${n1}
+cp data.nii.gz /rigel/psych/users/cmh2228/SB/autoptx/${n1}
+cp nodif_brain_mask.nii.gz /rigel/psych/users/cmh2228/SB/autoptx/${n1}
