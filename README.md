@@ -79,7 +79,7 @@ sbatch 4.tbss_4_prestats
 
 ```.bash
 #prepare autoptx folder 
-sbatch 0.prepare_autoptx_folders
+for n in SB*; do sbatch 0.prepare_autoptx_folders $n ; done
 
 for n in SB*; do sbatch autoptx1.sh $n; done 
 
