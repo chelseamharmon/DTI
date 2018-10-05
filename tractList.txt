@@ -1,0 +1,9 @@
+atr
+cgc
+cgh
+ifo
+ilf
+ptr
+slf
+str
+unc
