@@ -75,20 +75,6 @@ sbatch 4.tbss_4_prestats
 
  ```
 
-## autoptx
-
-```.bash
-#prepare autoptx folder 
-for n in SB*; do sbatch 0.prepare_autoptx_folders $n ; done
-
-for n in SB*; do sbatch autoptx1.sh $n; done 
-
-#This script runs: autoPtx_1_preproc ${n} 
-#and then: autoPtx_2_launchTractography 
-
-#done for "ar_l", "ar_r", "atr_l", "atr_r", "cgc_l", "cgc_r", "cgh_l", "cgh_r", "ifo_l", "ifo_r", "ilf_l", "ilf_r", "ptr_l", "ptr_r", "slf_l", "slf_r", "str_r", "str_l", "unc_l", "unc_r"
-
-```
 
 ## run bedpostx 
 
@@ -111,5 +97,45 @@ Using amydala as a seed
 for n in SB*; do sbatch 4.probtrackxAmygSeed.sh $n; done 
 
 ```
+
+## autoptx
+Run autoptx on habanero becuase takes a long time. Then copy to lux to run visualization and pull values. 
+
+```.bash
+#HABANERO
+#prepare autoptx folder 
+for n in SB*; do sbatch 0.prepare_autoptx_folders $n ; done
+
+cd /rigel/psych/users/cmh2228/SB/DTI/autoptx
+for n in SB*; do sbatch autoptx1.sh $n; done 
+
+#This script runs: autoPtx_1_preproc ${n} and then: autoPtx_2_launchTractography 
+
+#done for "ar_l", "ar_r", "atr_l", "atr_r", "cgc_l", "cgc_r", "cgh_l", "cgh_r", "ifo_l", "ifo_r", "ilf_l", "ilf_r", "ptr_l", "ptr_r", "slf_l", "slf_r", "str_r", "str_l", "unc_l", "unc_r"
+#Copy back to lux 
+
+#For everything:
+cd /rigel/psych/users/cmh2228/SB/DTI
+scp -r autoptx/* charmon@lux.psych.columbia.edu:/danl/SB/DTT/
+
+#For just indiviudal tracts 
+cd /rigel/psych/users/cmh2228/DTI/autoptx
+for n in SB*; do scp -r $n/str_? charmon@lux.psych.columbia.edu:/danl/SB/DTI/autoptx/tracts/$n
+
+
+#LUX
+#Creates .nii.gz using tractsNorm.nii.gz file for each tract in autoptx/visualise/ folder 
+cd /danl/SB/DTI/autoptx
+autoPtx_prepareForDisplay 0.005
+#This uses structureList from /usr/share/fs/5.0/bin/autoPtx/structureList and subjectList from /danl/SB/DTI/autoptx/preproc/subjectList
+
+#Extract all values for FA MD AD and RD from tracts created by autoptx 
+./danl/SB/DTI/scripts/autoptx/1.1extractAllValues.sh
+
+#Make a spreadsheet of all subjects values - uses subjectList.txt and tractList.txt from autoptx/preprox/ fodler 
+Rscript 1.2extractingAllValues.R 
+
+```
+
 
 
