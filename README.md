@@ -125,6 +125,7 @@ for n in SB*; do scp -r $n/str_? charmon@lux.psych.columbia.edu:/danl/SB/DTI/aut
 
 #LUX
 #Creates .nii.gz using tractsNorm.nii.gz file for each tract in autoptx/visualise/ folder 
+#Use edited autoPtx_prepareForDisplay file which can be found in this repository under /scripts/autoptx/
 cd /danl/SB/DTI/autoptx
 autoPtx_prepareForDisplay 0.005
 #This uses structureList from /usr/share/fs/5.0/bin/autoPtx/structureList and subjectList from /danl/SB/DTI/autoptx/preproc/subjectList
@@ -132,7 +133,7 @@ autoPtx_prepareForDisplay 0.005
 #Extract all values for FA MD AD and RD from tracts created by autoptx 
 ./danl/SB/DTI/scripts/autoptx/1.1extractAllValues.sh
 
-#Make a spreadsheet of all subjects values - uses subjectList.txt and tractList.txt from autoptx/preprox/ fodler 
+#Make a spreadsheet of all subjects values - uses subjectList.txt and tractList.txt from autoptx/preproc/ folder 
 Rscript 1.2extractingAllValues.R 
 
 ```
