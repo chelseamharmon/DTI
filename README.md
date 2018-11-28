@@ -47,6 +47,8 @@ for i in SB*; do sbatch eddy_opemp_batch.sh $n; done
 
 ```.R
 Rscript /scripts/motion_assess/extractingRMS.R 
+Rscript /scripts/motion_assess/extractingOutlierData.R 
+Rscript /scripts/motion_assess/extractingVolTransRotData.R 
 ```
 
 ## Fitting tensors 
