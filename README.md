@@ -146,5 +146,20 @@ Rscript 1.2extractingAllValues.R
 
 ```
 
+## Assessing motion outliers 
 
 
+```.R
+#Total Motion Index
+
+#Average volume by volume translation and rotation 
+Rscript /danl/SB/DTI/scripts/motion_assess/extractingVolTransRotData.R
+
+#Number of outlier slices 
+Rscript /danl/SB/DTI/scripts/motion_assess/extractingOutlierData.R
+
+#Severity of outlier slices 
+Rscript /danl/SB/DTI/scripts/motion_assess/extractingOutlierSeverity.R
+
+
+```
