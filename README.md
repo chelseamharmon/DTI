@@ -165,9 +165,7 @@ Rscript /danl/SB/DTI/scripts/motion_assess/extractingOutlierSeverity.R
 ```
 
 
-## Analyses Jan.2018
-TBSS Cluster Analyses 
-
+## Analyses Jan.2018  TBSS Cluster Analyses 
 
 Use no motion data - excluded visually spreadsheet: TBSS_cross_no64_motionExcluded.Jan2018
 1. remove FU timepoints from list: list=fu_rm_list
