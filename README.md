@@ -163,3 +163,81 @@ Rscript /danl/SB/DTI/scripts/motion_assess/extractingOutlierSeverity.R
 
 
 ```
+
+
+## Analyses Jan.2018
+TBSS Cluster Analyses 
+
+
+Use no motion data - excluded visually spreadsheet: TBSS_cross_no64_motionExcluded.Jan2018
+1. remove FU timepoints from list: list=fu_rm_list
+2. rerun TBSS prestats (on habanero)  
+
+```.bash
+tbss_3_postreg #(merges into single images) 
+tbss_4_prestats #(makes skeleton mask) 
+```
+on lux: 
+
+2 group design 
+EV1: Code 0 for COMP & 1 for PI (GROUP.PI) 
+EV2: Code 1 for COMP & 0 for PI (GROUP.COMP)
+EV3: Age in Mos (mean centered) 
+EV4: Code gender male 1 
+```.bash
+Glm &
+```
+Higher Level/non-timeseries design
+#inputs = 133
+
+wizard 
+	2 groups unpaired 
+	#of subjects in first group = 74
+	process 
+	paste 
+contrasts 4 
+		EV1	EV2 	EV3	EV4
+C1 PI > COMP 	1	-1	0	0	
+C2 COMP > PI	-1	1	0	0	
+C3 PosAgeEff	0	0	1	0	
+C4 NegAgeEff	0	0	-1	0
+
+for interaction 
+constrasts 2 
+		EV1	EV2 	EV3	EV4	EV5
+C1  PIxage 	0	0	1	-1	0
+C2 COMPxage	0	0	-1	1	0
+
+Run GLM model 
+```.bash
+randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000
+
+#Use --T2 for TBSS data to get TFCE results 
+#Can start with 500 instead of 5000 to see if it works correctly
+#DO this for all contrasts e.g. 
+randomise -i all_FA_skeleton_mask -d cross_ageInteraction.mat -t cross_ageInteraction.com --T2 -c 3.1 -n 5000
+```
+Extracting results 
+```.bash
+fslmaths tbss_ageEffects_clustere_corrp_tstat1.nii.gz -thr 0.95 -bin significant_results_mask1
+fslmeants -i all_FA_skeletonised.nii.gz -m significant_results_mask1.nii.g -o avg_tstat1.txt
+tbss_fill tbss_ageEffect_clustere_corrp_tstat1.nii.gz 0.949 mean_FA tbss_ageEffect_clustere_corrp_tstat1_filled #For visualizing ONLY (min/max display range should be set to .95/1.0 to show p<0.05
+```
+For reporting cluster results 
+```.bash
+cluster -i tbss_ageInt_tfce_corrp_tstat.nii.gz -t 0.95 -c tbss_ageInt_tstat.nii.gz --scalarname="1-p">cluster_corrp1.txt 
+#or:
+#cluster -i tbss_ageEffect_tfce_corrp -t 0.95 --oindex cluster_ageEffect2_index -c tbss_ageEffect_tstat2
+
+fslmaths -dt int cluster_index -thr 1 -uthr 1 -bin cluster_mask1
+```
+
+```.bash
+atlasquery --dumpatlases #Gives you atlases to choose from, e.g. atlasquery [-a "<atlasname>"] [-c <x>, <y>, <z>]
+#e.g.: 
+atlasquery -a "JHU White-Matter Tractography Atlas" -c -37 4 -30
+```
+Extracting values from masks to get longitudinal info 
+```.bash
+fslmeants -i all_FA_skeletonised -m cluster_ageEffect2_mask1 -o cluster1_ageEffect2_FAvalue.txt 
+```
