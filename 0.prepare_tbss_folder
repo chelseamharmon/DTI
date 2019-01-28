@@ -11,7 +11,7 @@ n1=$1_fu1
 n2=$1_fu2
 
 
-#mkdir TBSS
+mkdir TBSS
 
 
 cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
