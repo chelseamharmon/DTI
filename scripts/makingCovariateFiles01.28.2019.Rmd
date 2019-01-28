@@ -1,0 +1,157 @@
+---
+title: "Covariates"
+author: "Chelsea Harmon"
+date: "12/28/2017, updated 1/28/2019"
+output: html_document
+---
+
+---
+title: "Making group level covariates"
+author: "Michelle.VanTieghem"
+date: "Feb 10 2017"
+output: html_document
+---
+
+# pull the data from master database! 
+
+```{r, echo = FALSE}
+#setwd ("/Volumes/danl/SB/DTI/scripts/covariates_scripts/")
+setwd("/Users/chelseaharmon/Columbia/danlab/DTI/data/")
+#output.directory <- ("~/Volumes/danl/SB/DTI/scripts/covariates_scripts/")
+output.directory <- ("~/Columbia/danlab/DTI/covariatesFiles/")
+
+# get master data.
+full.df.master <- read.csv("~/Columbia/danlab/SB/Data_Entry_Master/J.Data_Entry_Master_3.14.2017_fixed_fixed.csv")
+full.df.master$SUB_ID <- full.df.master$IDENT_SUBID
+nrow(full.df.master)
+full.df.master$GROUP <- full.df.master$IDENT_SUBTYPE
+
+# get final sublist from all of your exclusion AND with Cortisol, N 59 
+# from your cross_sectionalData
+cross.data <- read.csv("~/Columbia/danlab/DTI/data/tbss_cross_over8_motionExcluded_1_2_2018.csv")
+nrow(cross.data)
+head(cross.data)
+#cross.data$GROUP <- full.df.master$IDENT_SUBTYPE
+long.data <- read.csv("~/Columbia/danlab/DTI/data/tbss_long_over8_motionExcluded_1_25_2018.csv")   # old 11_28_2017.csv
+
+nrow(long.data)
+head(long.data)
+#long.data$GROUP <- full.df.master$IDENT_SUBTYPE
+```
+
+# Making covariate files with Cross Sectional Dataset
+```{r, echo = FALSE}
+# checking age variable... should be identical! 
+max(cross.data$GROUP.PI, na.rm=TRUE)
+cross.data$GROUP.PI <- cross.data$GROUP
+cross.data$GROUP.COMP <- ifelse(cross.data$GROUP == 1, 0, ifelse(cross.data$GROUP == 0, 1, NA))
+#full.df.master$Age_Mos_Matching <- full.df.master$SUBAGE_session2
+cross.data$gender <- cross.data$DEM_3_GENDER_CHILD
+cross.data$age <- cross.data$MeanCenteredAge
+max(cross.data$GROUP.PI, na.rm=TRUE)
+max(cross.data$GROUP.COMP, na.rm=TRUE)
+max(cross.data$gender, na.rm=TRUE)
+max(cross.data$age, na.rm=TRUE)
+
+#full.df.master$gender <- full.df.master$DEM_3_GENDER_CHILD
+
+covariates <- data.frame(cross.data$SUB_IDENT, cross.data$GROUP.PI, cross.data$GROUP.COMP, cross.data$age, cross.data$gender)
+names(covariates) <- cbind("SUB_IDENT", "GROUP.PI", "GROUP.COMP", "age", "sex")
+```
+
+# Making covariate files with Longitudinal data set
+```{r, echo = FALSE}
+# checking age variable... should be identical! 
+max(long.data$GROUP.PI, na.rm=TRUE)
+long.data$GROUP.PI <- long.data$GROUP
+long.data$GROUP.COMP <- ifelse(long.data$GROUP == 1, 0, ifelse(long.data$GROUP == 0, 1, NA))
+
+#full.df.master$Age_Mos_Matching <- full.df.master$SUBAGE_session2
+long.data$gender <- long.data$DEM_3_GENDER_CHILD
+long.data$age <- long.data$MeanCenteredAge
+max(long.data$GROUP.PI, na.rm=TRUE)
+max(long.data$GROUP.COMP, na.rm=TRUE)
+#max(long.data$gender, na.rm=TRUE)
+
+full.df.master$idnum_long <- as.character(full.df.master$IDENT_SUBID)
+sub <- full.df.master[ , c("idnum_long","IDENT_SUBTYPE", "SUBAGE_session2", "SUBAGE_session3", "SUBAGE_session4", "DEM_3_GENDER_CHILD")]
+
+# convert into a long dataset by wave, repeating AGE
+library(dplyr)
+library(tidyverse)
+sub_long <- gather(sub, Session, Age, SUBAGE_session2:SUBAGE_session4)
+
+# make a long-version of this ID number. we will use this to merge with fsdata.
+sub_long$SUBJECTID_long <- ifelse(sub_long$Session == "SUBAGE_session3", paste0(sub_long$idnum_long, "_fu1"), ifelse(sub_long$Session == "SUBAGE_session4", paste0(sub_long$idnum_long, "_fu2"), sub_long$idnum_long))
+
+long.data<- merge(long.data, sub_long, by="SUBJECTID_long")
+long.data$gender <- long.data$DEM_3_GENDER_CHILD
+
+#full.df.master$gender <- full.df.master$DEM_3_GENDER_CHILD
+
+covariates <- data.frame(long.data$SUB_IDENT, long.data$GROUP.PI, long.data$GROUP.COMP, long.data$age, long.data$gender)
+names(covariates) <- cbind("SUB_IDENT", "GROUP.PI", "GROUP.COMP", "age", "sex")
+```
+
+### WRITING CrossSecional COVARIATE FILES
+```{r, echo = FALSE}
+# write this one... as a check of SUBJECTID order
+file.name <- paste0(output.directory, "cross_covariates_withnames.txt")
+write.table(covariates, file.name, quote = FALSE, na = "", row.names = FALSE)
+ncol(covariates)
+# then get rid of subject ID for copy paste into FSL 
+covariate.file <- covariates[,2:5]
+max(covariate.file, na.rm=TRUE)
+#View(covariate.file)
+file.name <- paste0(output.directory, "cross_covariates.txt")
+write.table(covariate.file, file.name, quote = FALSE, na = "", row.names = FALSE)
+```
+
+### WRITING Longitudinal COVARIATE FILES
+```{r, echo = FALSE}
+# write this one... as a check of SUBJECTID order
+file.name <- paste0(output.directory, "long_covariates_withnames01.28.2019.txt")
+write.table(covariates, file.name, quote = FALSE, na = "", row.names = FALSE)
+ncol(covariates)
+# then get rid of subject ID for copy paste into FSL 
+covariate.file <- covariates[,2:5]
+max(covariate.file, na.rm=TRUE)
+#View(covariate.file)
+file.name <- paste0(output.directory, "long_covariates_01.28.2019.txt")
+write.table(covariate.file, file.name, quote = FALSE, na = "", row.names = FALSE)
+```
+
+
+
+
+
+### making group X age interaction Crosseciontal 
+```{r, echo = FALSE}
+covariate.file$PIxAge <- covariate.file$age*covariate.file$GROUP.PI
+covariate.file$CompxAge <- covariate.file$age*covariate.file$GROUP.COMP
+
+covariate.file.int <- data.frame(cross.data$GROUP.PI, cross.data$GROUP.COMP, covariate.file$PIxAge, covariate.file$CompxAge, cross.data$gender)
+#could possibly add age by itself here before gender (above)
+names(covariate.file.int) <- cbind("GROUP.PI", "GROUP.COMP", "PIxAge", "COMPxAge", "sex")
+head(covariate.file.int)
+file.name <- paste0(output.directory, "cross_covariates_GroupxAge.txt")
+write.table(covariate.file.int, file.name, quote= FALSE, row.names = FALSE)
+ncol(covariate.file.int)
+```
+
+
+### making group X CORT interaction Longitduinal
+```{r, echo = FALSE}
+covariate.file$PIxAge <- covariate.file$age*covariate.file$GROUP.PI
+covariate.file$CompxAge <- covariate.file$age*covariate.file$GROUP.COMP
+
+covariate.file.int <- data.frame(long.data$GROUP.PI, long.data$GROUP.COMP, covariate.file$PIxAge, covariate.file$CompxAge, long.data$gender)
+#could possibly add age by itself here before gender (above)
+names(covariate.file.int) <- cbind("GROUP.PI", "GROUP.COMP", "PIxAge", "COMPxAge", "sex")
+head(covariate.file.int)
+file.name <- paste0(output.directory, "long_covariates_GroupxAge01.28.2019.txt")
+write.table(covariate.file.int, file.name, quote= FALSE, row.names = FALSE)
+ncol(covariate.file.int)
+```
+
+
