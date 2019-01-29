@@ -225,6 +225,8 @@ Use no motion data - excluded visually spreadsheet: TBSS_cross_no64_motionExclud
 tbss_3_postreg #(merges into single images) 
 tbss_4_prestats #(makes skeleton mask) 
 ```
+
+```.bash
 on lux: 
 
 2 group design 
@@ -232,6 +234,9 @@ EV1: Code 0 for COMP & 1 for PI (GROUP.PI)
 EV2: Code 1 for COMP & 0 for PI (GROUP.COMP)
 EV3: Age in Mos (mean centered) 
 EV4: Code gender male 1 
+```
+
+
 ```.bash
 Glm &
 ```
@@ -239,6 +244,7 @@ Higher Level/non-timeseries design
 #inputs = 133
 
 wizard 
+```.bash
 	2 groups unpaired 
 	#of subjects in first group = 74
 	process 
@@ -268,6 +274,7 @@ constrasts 2
 C1  CompXage 	0	0	1	-1	0
 C2  PIXage	0	0	-1	1	0
 
+```
 Paste - paste in covariates you made (use contol y - bc it is using matlab) 
 Save *rename /TBSS_cross_01.29.2019/cross_ageInteraction
 
@@ -313,13 +320,13 @@ fslmeants -i all_FA_skeletonised -m cluster_ageEffect2_mask1 -o cluster1_ageEffe
 ## Analyses Jan.2019 TBSS Cluster with all data points (not modelling longitudinally) 
 Use no motion data - excluded visually spreadsheet: TBSS_long_no64_motionExcluded.Jan2018
 on lux: 
-
+```.bash
 2 group design 
 EV1: Code 0 for COMP & 1 for PI (GROUP.PI) 
 EV2: Code 1 for COMP & 0 for PI (GROUP.COMP)
 EV3: Age in Mos (mean centered) 
 EV4: Code gender male 1 
-
+```
 # Making covariate files
 ```.bash
 #Finding age and sex to add as covariates - use output text files to "paste" into Glm &
@@ -332,7 +339,7 @@ Glm &
 ```
 Higher Level/non-timeseries design
 #inputs = 227
-
+```
 wizard 
 	2 groups unpaired 
 	#of subjects in first group = 127
@@ -355,7 +362,7 @@ constrasts 2
 		EV1	EV2 	EV3	EV4	EV5
 C1  COMPxage 	0	0	1	-1	0
 C2  PIxage	0	0	-1	1	0
-
+```
 Run GLM model 
 ```.bash
 randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffectLong -m mean_FA_skeleton_mask.nii.gz -d long_ageEffect.mat -t long_ageEffect.com --T2 -c 3.1 -n 5000
