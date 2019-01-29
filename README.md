@@ -6,7 +6,7 @@ SB DTI Pipeline
 ## Creating DTI folders and Converting dicoms to NIfti 
 
 ```.bash 
-foreach n (SB002_fu2 SB018_fu2 SB019_fu2…)
+#use foreach n (SB002_fu2 SB018_fu2 SB019_fu2…) from line 3 of subjects 
 
 cd /danl/SB/${n}/anatomical/PING_30DIR_LONGTR_4/
 
@@ -66,9 +66,11 @@ dtifit -k eddy_unwarped_images -m hifi_nodif_brain_mask -r bvecs -b bvals -o dti
 run on habanero 
 
 ```.bash
-sbatch 0.prepare_tbss_folder 
+
+for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch 0.prepare_tbss_folder $n; done
 #This script creates one folder with all _dti_FA.nii.gz files and renames them to order by group (COMP/PI)
 
+cd /TBSS
 sbatch 1.tbss_1_preproc 
 #This script runs: tbss_1_preproc *nii.gz
 
@@ -79,6 +81,26 @@ sbatch 3.tbss_3_postreg
 #This script runs: tbss_3_postreg -S
 
 sbatch 4.tbss_4_prestats
+#This script runs: tbss_4_prestats 0.2
+
+ ```
+ # For running with all subjects 
+ ```.bash
+
+for n in *copy list of subjects from subjects line 8 #TBSS Long*; do sbatch 0.prepare_tbss_folder $n; done
+#This script creates one folder with all _dti_FA.nii.gz files and renames them to order by group (COMP/PI)
+
+cp TBSS/ TBSS_long
+sbatch 1.tbss_1_preproc_long 
+#This script runs: tbss_1_preproc *nii.gz
+
+sbatch 2.tbss_2_reg_long
+#This script runs: tbss_2_reg -T
+
+sbatch 3.tbss_3_postreg_long 
+#This script runs: tbss_3_postreg -S
+
+sbatch 4.tbss_4_prestats_long
 #This script runs: tbss_4_prestats 0.2
 
  ```
@@ -210,6 +232,9 @@ Run GLM model
 ```.bash
 randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000
 
+#also do this for MD, AD, RD e.g.
+randomise -i all_MD_skeletonised.nii.gz -o tbss_MD_geEffect -m mean_MD_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000
+
 #Use --T2 for TBSS data to get TFCE results 
 #Can start with 500 instead of 5000 to see if it works correctly
 #DO this for all contrasts e.g. 
@@ -238,4 +263,56 @@ atlasquery -a "JHU White-Matter Tractography Atlas" -c -37 4 -30
 Extracting values from masks to get longitudinal info 
 ```.bash
 fslmeants -i all_FA_skeletonised -m cluster_ageEffect2_mask1 -o cluster1_ageEffect2_FAvalue.txt 
+```
+
+
+## Analyses Jan.2019 TBSS Cluster with all data points
+Use no motion data - excluded visually spreadsheet: TBSS_long_no64_motionExcluded.Jan2018
+on lux: 
+
+2 group design 
+EV1: Code 0 for COMP & 1 for PI (GROUP.PI) 
+EV2: Code 1 for COMP & 0 for PI (GROUP.COMP)
+EV3: Age in Mos (mean centered) 
+EV4: Code gender male 1 
+
+# Making covariate files
+```.bash
+#Finding age and sex to add as covariates - use output text files to "paste" into Glm &
+/scripts/makingCovariateFiles01.28.2019.Rmd
+
+```
+
+```.bash
+Glm &
+```
+Higher Level/non-timeseries design
+#inputs = 227
+
+wizard 
+	2 groups unpaired 
+	#of subjects in first group = 127
+	process 
+	paste 
+contrasts 4 
+		EV1	EV2 	EV3	EV4
+C1 COMP > PI 	1	-1	0	0	
+C2 PI > COMP	-1	1	0	0	
+C3 PosAgeEff	0	0	1	0	
+C4 NegAgeEff	0	0	-1	0
+
+for interaction 
+constrasts 2 
+		EV1	EV2 	EV3	EV4	EV5
+C1  PIxage 	0	0	1	-1	0
+C2 COMPxage	0	0	-1	1	0
+
+Run GLM model 
+```.bash
+randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000
+
+#Use --T2 for TBSS data to get TFCE results 
+#Can start with 500 instead of 5000 to see if it works correctly
+#DO this for all contrasts e.g. 
+randomise -i all_FA_skeleton_mask -d cross_ageInteraction.mat -t cross_ageInteraction.com --T2 -c 3.1 -n 5000
 ```
