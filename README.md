@@ -1,7 +1,7 @@
 # DTI
 SB DTI Pipeline
 
-## Preprocessing 
+# Preprocessing 
 
 ## Creating DTI folders and Converting dicoms to NIfti 
 
@@ -105,6 +105,23 @@ sbatch 4.tbss_4_prestats_long
 
  ```
 
+## For running statistics on MD, L1, L2, L3 
+
+```.bash
+#Moving folders and renaming 
+mkdir /rigel/psych/users/cmh2228/SB/TBSS/MD
+for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch 0.prepare_tbss_folders $n; done
+#This script moves subjects _dti_MD.nii.gz files and renames them _dti_FA.nii.gz for running tbss_non_FA MD
+#Running tbss 
+sbatch 5.tbss_non_FA
+
+
+
+#for longidutinal set 
+for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch 0.prepare_tbss_folders_nonFA_long $n; done
+sbatch 5.tbss_non_FA_long
+```
+
 
 ## run bedpostx 
 
@@ -186,8 +203,19 @@ Rscript /danl/SB/DTI/scripts/motion_assess/extractingOutlierSeverity.R
 
 ```
 
+# Analyses
 
-## Analyses Jan.2018  TBSS Cluster Analyses 
+## Analyses Jan.2018  TBSS Cluster Analyses - 
+find in folder TBSS_cross_no64_motionExcluded.Jan2018/
+All TBSS redone Jan 2019 using same pipeline - find on Habanero TBSS/ 
+
+# Making covariates file 
+Using list of subject IDs - merge with full data set in this script 
+```{r}
+rstudio makingCovariatesFileLong01.28.2019
+```
+
+# Creating glm files to run 
 
 Use no motion data - excluded visually spreadsheet: TBSS_cross_no64_motionExcluded.Jan2018
 1. remove FU timepoints from list: list=fu_rm_list
@@ -215,22 +243,38 @@ wizard
 	#of subjects in first group = 74
 	process 
 	paste 
+EVs
+Number of main EVs 4 
+Contrasts & F-tests
 contrasts 4 
+*note these Comp & PI may be flipped in TBSS_cross_no64_motionExcluded_Jan2018*
+
 		EV1	EV2 	EV3	EV4
-C1 PI > COMP 	1	-1	0	0	
-C2 COMP > PI	-1	1	0	0	
+		COMP	PI	Age_mc	Gender	
+C1 COMP > PI 	1	-1	0	0	
+C2 PI > COMP	-1	1	0	0	
 C3 PosAgeEff	0	0	1	0	
 C4 NegAgeEff	0	0	-1	0
 
-for interaction 
+Paste - paste in covariates you made (use contol y - bc it is using matlab) 
+Save *rename /TBSS_cross_01.29.2019/cross_ageEffect
+
+# for interaction 
+EVs
+Number of main EVs 5
+Contrasts & F-tests
 constrasts 2 
 		EV1	EV2 	EV3	EV4	EV5
-C1  PIxage 	0	0	1	-1	0
-C2 COMPxage	0	0	-1	1	0
+C1  CompXage 	0	0	1	-1	0
+C2  PIXage	0	0	-1	1	0
+
+Paste - paste in covariates you made (use contol y - bc it is using matlab) 
+Save *rename /TBSS_cross_01.29.2019/cross_ageInteraction
+
 
 Run GLM model 
 ```.bash
-randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000
+randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000  #changed output to be tbss_FA_AgeEffect on habanero rerun - see script 6.randomise.cross 
 
 #also do this for MD, AD, RD e.g.
 randomise -i all_MD_skeletonised.nii.gz -o tbss_MD_geEffect -m mean_MD_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000
@@ -266,7 +310,7 @@ fslmeants -i all_FA_skeletonised -m cluster_ageEffect2_mask1 -o cluster1_ageEffe
 ```
 
 
-## Analyses Jan.2019 TBSS Cluster with all data points
+## Analyses Jan.2019 TBSS Cluster with all data points (not modelling longitudinally) 
 Use no motion data - excluded visually spreadsheet: TBSS_long_no64_motionExcluded.Jan2018
 on lux: 
 
@@ -280,7 +324,7 @@ EV4: Code gender male 1
 ```.bash
 #Finding age and sex to add as covariates - use output text files to "paste" into Glm &
 /scripts/makingCovariateFiles01.28.2019.Rmd
-
+/ChelseaHarmon/Columbia/danlab/DTI/data/makingCovariateFilesLongHabanero01.28.2019.Rmd
 ```
 
 ```.bash
@@ -295,21 +339,26 @@ wizard
 	process 
 	paste 
 contrasts 4 
+
+Number of main EVs 4
+		
 		EV1	EV2 	EV3	EV4
+		Comp	PI	Age_mc	Sex
 C1 COMP > PI 	1	-1	0	0	
 C2 PI > COMP	-1	1	0	0	
 C3 PosAgeEff	0	0	1	0	
 C4 NegAgeEff	0	0	-1	0
 
 for interaction 
+Number of main EVs 5 
 constrasts 2 
 		EV1	EV2 	EV3	EV4	EV5
-C1  PIxage 	0	0	1	-1	0
-C2 COMPxage	0	0	-1	1	0
+C1  COMPxage 	0	0	1	-1	0
+C2  PIxage	0	0	-1	1	0
 
 Run GLM model 
 ```.bash
-randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000
+randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffectLong -m mean_FA_skeleton_mask.nii.gz -d long_ageEffect.mat -t long_ageEffect.com --T2 -c 3.1 -n 5000
 
 #Use --T2 for TBSS data to get TFCE results 
 #Can start with 500 instead of 5000 to see if it works correctly
