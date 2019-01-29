@@ -1,0 +1,51 @@
+#!/bin/sh
+
+#SBATCH --account=psych
+#SBATCH --job-name=tbss_prep_long
+#SBATCH -c 1
+#SBATCH --time=24:30:00
+#SBATCH --mem-per-cpu=8gb
+
+n=$1
+
+#cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
+#cp CON_${n}_dti_L1.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/L1
+#cd /rigel/psych/users/cmh2228/SB/TBSS_long/L1
+#mv CON_${n}_dti_L1.nii.gz CON_${n}_dti_FA.nii.gz
+
+#cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
+#cp PI_${n}_dti_L1.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/L1
+#cd /rigel/psych/users/cmh2228/SB/TBSS_long/L1
+#mv PI_${n}_dti_L1.nii.gz PI_${n}_dti_FA.nii.gz
+
+cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
+cp CON_${n}_dti_MD.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/MD
+cd /rigel/psych/users/cmh2228/SB/TBSS_long/MD
+mv CON_${n}_dti_MD.nii.gz CON_${n}_dti_FA.nii.gz
+
+cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
+cp PI_${n}_dti_MD.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/MD
+cd /rigel/psych/users/cmh2228/SB/TBSS_long/MD
+mv PI_${n}_dti_MD.nii.gz PI_${n}_dti_FA.nii.gz
+
+
+cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
+cp CON_${n}_dti_L2.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/L2
+cd /rigel/psych/users/cmh2228/SB/TBSS_long/L2
+mv CON_${n}_dti_L2.nii.gz CON_${n}_dti_FA.nii.gz
+
+cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
+cp PI_${n}_dti_L2.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/L2
+cd /rigel/psych/users/cmh2228/SB/TBSS_long/L2
+mv PI_${n}_dti_L2.nii.gz PI_${n}_dti_FA.nii.gz
+
+cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
+cp CON_${n}_dti_L3.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/L3
+cd /rigel/psych/users/cmh2228/SB/TBSS_long/L3
+mv CON_${n}_dti_L3.nii.gz CON_${n}_dti_FA.nii.gz
+
+cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
+cp PI_${n}_dti_L3.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/L3
+cd /rigel/psych/users/cmh2228/SB/TBSS_long/L3
+mv PI_${n}_dti_L3.nii.gz PI_${n}_dti_FA.nii.gz
+
