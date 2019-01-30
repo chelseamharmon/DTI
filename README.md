@@ -226,7 +226,7 @@ tbss_3_postreg #(merges into single images)
 tbss_4_prestats #(makes skeleton mask) 
 ```
 
-```.bash
+
 on lux: 
 
 2 group design 
@@ -234,7 +234,7 @@ EV1: Code 0 for COMP & 1 for PI (GROUP.PI)
 EV2: Code 1 for COMP & 0 for PI (GROUP.COMP)
 EV3: Age in Mos (mean centered) 
 EV4: Code gender male 1 
-```
+
 
 
 ```.bash
@@ -244,7 +244,7 @@ Higher Level/non-timeseries design
 #inputs = 133
 
 wizard 
-```.bash
+```
 	2 groups unpaired 
 	#of subjects in first group = 74
 	process 
@@ -275,9 +275,9 @@ C1  CompXage 	0	0	1	-1	0
 C2  PIXage	0	0	-1	1	0
 
 ```
-Paste - paste in covariates you made (use contol y - bc it is using matlab) 
-Save *rename /TBSS_cross_01.29.2019/cross_ageInteraction
+Paste - paste in covariates you made (use contol y - bc it is using matlab) *make sure the order is the same - it is VERY important that you keep the order of the matrix consistent with the order that TBSS processed your data. To check the order that TBSS used, navigate to the FA folder created by TBSS and type the command [bash] imglob *_FA.*[/bash] 
 
+Save *rename /TBSS_cross_01.29.2019/cross_ageInteraction
 
 Run GLM model 
 ```.bash
@@ -291,13 +291,22 @@ randomise -i all_MD_skeletonised.nii.gz -o tbss_MD_geEffect -m mean_MD_skeleton_
 #DO this for all contrasts e.g. 
 randomise -i all_FA_skeleton_mask -d cross_ageInteraction.mat -t cross_ageInteraction.com --T2 -c 3.1 -n 5000
 ```
+
+to view: 
+```.bash
+fslview $FSLDIR/data/standard/MNI152_T1_1mm mean_FA_skeleton -l Green -b 0.2,0.7 tbss_tfce_corrp_tstat1 -l Red-Yellow -b 0.95,1
+```
+
 Extracting results 
+
 ```.bash
 fslmaths tbss_ageEffects_clustere_corrp_tstat1.nii.gz -thr 0.95 -bin significant_results_mask1
 fslmeants -i all_FA_skeletonised.nii.gz -m significant_results_mask1.nii.g -o avg_tstat1.txt
 tbss_fill tbss_ageEffect_clustere_corrp_tstat1.nii.gz 0.949 mean_FA tbss_ageEffect_clustere_corrp_tstat1_filled #For visualizing ONLY (min/max display range should be set to .95/1.0 to show p<0.05
 ```
+
 For reporting cluster results 
+
 ```.bash
 cluster -i tbss_ageInt_tfce_corrp_tstat.nii.gz -t 0.95 -c tbss_ageInt_tstat.nii.gz --scalarname="1-p">cluster_corrp1.txt 
 #or:
@@ -311,7 +320,9 @@ atlasquery --dumpatlases #Gives you atlases to choose from, e.g. atlasquery [-a 
 #e.g.: 
 atlasquery -a "JHU White-Matter Tractography Atlas" -c -37 4 -30
 ```
+
 Extracting values from masks to get longitudinal info 
+
 ```.bash
 fslmeants -i all_FA_skeletonised -m cluster_ageEffect2_mask1 -o cluster1_ageEffect2_FAvalue.txt 
 ```
@@ -363,6 +374,7 @@ constrasts 2
 C1  COMPxage 	0	0	1	-1	0
 C2  PIxage	0	0	-1	1	0
 ```
+
 Run GLM model 
 ```.bash
 randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffectLong -m mean_FA_skeleton_mask.nii.gz -d long_ageEffect.mat -t long_ageEffect.com --T2 -c 3.1 -n 5000
