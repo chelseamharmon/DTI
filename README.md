@@ -294,24 +294,25 @@ Save *rename /TBSS_cross_01.29.2019/cross_ageInteraction
 
 Run GLM model *done on habanero for speed* 
 ```.bash
+#Use --T2 for TBSS data to get TFCE results 
+#Can start with 500 instead of 5000 to see if it works correctly
+#DO this for all contrasts e.g. 
+
 randomise -i all_FA_skeletonised.nii.gz -o tbss_FA_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000  #see script 6.randomise.cross 
 
 #also do this for MD, AD, RD e.g.
 randomise -i all_MD_skeletonised.nii.gz -o tbss_MD_geEffect -m mean_MD_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000 #see script 6.randomise.cross_MD 
 
 #For RD, before running randomise combine L2 and L3 - can be found in 5.5combineRD on habanero 
-fslmaths all_L2.nii.gz -add all_L3.nii.gz -div 2 all_RD.nii.gz
-sbatch 6.randomise_cross_RD 
+fslmaths all_L2.nii.gz -add all_L3.nii.gz -div 2 all_RD.nii.gz #or on habanero run: sbatch 6.randomise_cross_RD 
 ```
-
+Interactions: 
 ```.bash
-#Use --T2 for TBSS data to get TFCE results 
-#Can start with 500 instead of 5000 to see if it works correctly
-#DO this for all contrasts e.g. 
+
 randomise -i all_FA_skeletonised.nii.gz -o tbss_ageInteraction -m mean_FA_skeleton_mask.nii.gz -d cross_ageInteraction.mat -t cross_ageInteraction.com --T2 -c 3.1 -n 5000
 ```
 
-copy to lux 
+copy outputs to lux 
 to view: 
 ```.bash
 fslview $FSLDIR/data/standard/MNI152_T1_1mm mean_FA_skeleton -l Green -b 0.2,0.7 tbss_tfce_corrp_tstat1 -l Red-Yellow -b 0.95,1
