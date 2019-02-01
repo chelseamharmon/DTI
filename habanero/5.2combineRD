@@ -1,0 +1,11 @@
+#!/bin/sh
+
+#SBATCH --account=psych
+#SBATCH --job-name=tbss_prep_RD
+#SBATCH -c 1
+#SBATCH --time=00:10:00
+#SBATCH --mem-per-cpu=32gb
+
+cd /rigel/psych/users/cmh2228/SB/TBSS/stats
+fslmaths all_L2.nii.gz -add all_L3.nii.gz -div 2 all_RD.nii.gz
+fslmaths all_L2_skeletonised.nii.gz -add all_L3_skeletonised.nii.gz -div 2 all_RD_skeletonised.nii.gz
