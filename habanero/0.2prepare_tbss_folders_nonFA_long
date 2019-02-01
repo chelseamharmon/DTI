@@ -8,15 +8,15 @@
 
 n=$1
 
-#cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
-#cp CON_${n}_dti_L1.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/L1
-#cd /rigel/psych/users/cmh2228/SB/TBSS_long/L1
-#mv CON_${n}_dti_L1.nii.gz CON_${n}_dti_FA.nii.gz
+cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
+cp CON_${n}_dti_L1.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/L1
+cd /rigel/psych/users/cmh2228/SB/TBSS_long/L1
+mv CON_${n}_dti_L1.nii.gz CON_${n}_dti_FA.nii.gz
 
-#cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
-#cp PI_${n}_dti_L1.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/L1
-#cd /rigel/psych/users/cmh2228/SB/TBSS_long/L1
-#mv PI_${n}_dti_L1.nii.gz PI_${n}_dti_FA.nii.gz
+cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
+cp PI_${n}_dti_L1.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/L1
+cd /rigel/psych/users/cmh2228/SB/TBSS_long/L1
+mv PI_${n}_dti_L1.nii.gz PI_${n}_dti_FA.nii.gz
 
 cd /rigel/psych/users/cmh2228/SB/${n}/anatomical/DTI
 cp CON_${n}_dti_MD.nii.gz /rigel/psych/users/cmh2228/SB/TBSS_long/MD
