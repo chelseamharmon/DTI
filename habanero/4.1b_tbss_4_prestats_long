@@ -1,0 +1,12 @@
+#!/bin/sh
+
+#SBATCH --account=psych
+#SBATCH --job-name=tbss_4
+#SBATCH -c 1
+#SBATCH --time=24:30:00
+#SBATCH --mem-per-cpu=64gb
+
+cd /rigel/psych/users/cmh2228/SB/TBSS_long/
+
+tbss_4_prestats 0.2
+
