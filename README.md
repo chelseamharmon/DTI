@@ -206,26 +206,20 @@ Rscript /danl/SB/DTI/scripts/motion_assess/extractingOutlierSeverity.R
 # Analyses
 
 ## Analyses Jan.2018  TBSS Cluster Analyses - 
-find in folder TBSS_cross_no64_motionExcluded.Jan2018/
-All TBSS redone Jan 2019 using same pipeline - find on Habanero TBSS/ 
+These were done incorrectly - with COMP and PI switched - find in folder TBSS_cross_no64_motionExcluded.Jan2018/
+All TBSS redone Jan 2019 using updated pipeline (Changed: Covaraiates file and Interaction model to include main effects)
+- find on Habanero TBSS/ 
 
 # Making covariates file 
 Using list of subject IDs - merge with full data set in this script 
 ```{r}
-rstudio makingCovariatesFileLong01.28.2019
+rstudio ~/Columbia/danlab/DTI/data/makingCovariatesFileLong01.28.2019 #this does both cross-sectional and all data points 
+#output files 1. cross_covarites.txt 2. cross_covariates_GroupXAge01.29.2019.txt
 ```
 
 # Creating glm files to run 
 
 Use no motion data - excluded visually spreadsheet: TBSS_cross_no64_motionExcluded.Jan2018
-1. remove FU timepoints from list: list=fu_rm_list
-2. rerun TBSS prestats (on habanero)  
-
-```.bash
-tbss_3_postreg #(merges into single images) 
-tbss_4_prestats #(makes skeleton mask) 
-```
-
 
 on lux: 
 
@@ -264,13 +258,32 @@ C4 NegAgeEff	0	0	-1	0
 
 Paste - paste in covariates you made (use contol y - bc it is using matlab) 
 Save *rename /TBSS_cross_01.29.2019/cross_ageEffect
+```
 
+```
 # for interaction 
+EVs
+Number of main EVs 6
+Contrasts & F-tests
+constrasts 5 
+
+		EV1	EV2 	EV3	EV4	EV5	EV6
+		COMP	PI	Age_mc	Comp*age PI*age	Gender	
+C1 COMP > PI 	1	-1	0	0	0	0
+C2 PI > COMP	-1	1	0	0	0	0
+C3 PosAgeEff	0	0	1	0	0	0
+C4  CompXage 	0	0	0	1	-1	0
+C5  PIXage	0	0	0	-1	1	0
+
+
+or #per FSL website 
 EVs
 Number of main EVs 5
 Contrasts & F-tests
-constrasts 2 
+constrasts 2
+
 		EV1	EV2 	EV3	EV4	EV5
+		COMP	PI	Comp*age PI*age	Gender	
 C1  CompXage 	0	0	1	-1	0
 C2  PIXage	0	0	-1	1	0
 
@@ -279,19 +292,26 @@ Paste - paste in covariates you made (use contol y - bc it is using matlab) *mak
 
 Save *rename /TBSS_cross_01.29.2019/cross_ageInteraction
 
-Run GLM model 
+Run GLM model *done on habanero for speed* 
 ```.bash
-randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000  #changed output to be tbss_FA_AgeEffect on habanero rerun - see script 6.randomise.cross 
+randomise -i all_FA_skeletonised.nii.gz -o tbss_FA_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000  #see script 6.randomise.cross 
 
 #also do this for MD, AD, RD e.g.
-randomise -i all_MD_skeletonised.nii.gz -o tbss_MD_geEffect -m mean_MD_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000
+randomise -i all_MD_skeletonised.nii.gz -o tbss_MD_geEffect -m mean_MD_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000 #see script 6.randomise.cross_MD 
 
+#For RD, before running randomise combine L2 and L3 - can be found in 5.5combineRD on habanero 
+fslmaths all_L2.nii.gz -add all_L3.nii.gz -div 2 all_RD.nii.gz
+sbatch 6.randomise_cross_RD 
+```
+
+```.bash
 #Use --T2 for TBSS data to get TFCE results 
 #Can start with 500 instead of 5000 to see if it works correctly
 #DO this for all contrasts e.g. 
-randomise -i all_FA_skeleton_mask -d cross_ageInteraction.mat -t cross_ageInteraction.com --T2 -c 3.1 -n 5000
+randomise -i all_FA_skeletonised.nii.gz -o tbss_ageInteraction -m mean_FA_skeleton_mask.nii.gz -d cross_ageInteraction.mat -t cross_ageInteraction.com --T2 -c 3.1 -n 5000
 ```
 
+copy to lux 
 to view: 
 ```.bash
 fslview $FSLDIR/data/standard/MNI152_T1_1mm mean_FA_skeleton -l Green -b 0.2,0.7 tbss_tfce_corrp_tstat1 -l Red-Yellow -b 0.95,1
@@ -342,7 +362,7 @@ EV4: Code gender male 1
 ```.bash
 #Finding age and sex to add as covariates - use output text files to "paste" into Glm &
 /scripts/makingCovariateFiles01.28.2019.Rmd
-/ChelseaHarmon/Columbia/danlab/DTI/data/makingCovariateFilesLongHabanero01.28.2019.Rmd
+/chelseaharmon/Columbia/danlab/DTI/data/makingCovariateFilesLongHabanero01.28.2019.Rmd
 ```
 
 ```.bash
@@ -366,18 +386,33 @@ C1 COMP > PI 	1	-1	0	0
 C2 PI > COMP	-1	1	0	0	
 C3 PosAgeEff	0	0	1	0	
 C4 NegAgeEff	0	0	-1	0
+```
+save *long_ageEffect.fsf
 
+```
 for interaction 
 Number of main EVs 5 
 constrasts 2 
-		EV1	EV2 	EV3	EV4	EV5
-C1  COMPxage 	0	0	1	-1	0
-C2  PIxage	0	0	-1	1	0
+
+		EV1	EV2 	EV3	EV4	EV5	EV6
+		Comp	PI	Age	Age*Comp Age*PI	Sex
+C1 COMP > PI 	1	-1	0	0	0	0
+C2 PI > COMP	-1	1	0	0	0	0
+C3 PosAgeEff	0	0	1	0	0	0
+C4 NegAgeEff	0	0	-1	0	0	0
+C5 COMPxage 	0	0	0	1	-1	0
+C6 PIxage	0	0	0	-1	1	0
+
 ```
+save *long_ageInteraction.fsf
+ 
+
 
 Run GLM model 
 ```.bash
 randomise -i all_FA_skeletonised.nii.gz -o tbss_AgeEffectLong -m mean_FA_skeleton_mask.nii.gz -d long_ageEffect.mat -t long_ageEffect.com --T2 -c 3.1 -n 5000
+
+
 
 #Use --T2 for TBSS data to get TFCE results 
 #Can start with 500 instead of 5000 to see if it works correctly
