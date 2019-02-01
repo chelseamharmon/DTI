@@ -1,0 +1,11 @@
+#!/bin/sh
+
+#SBATCH --account=psych
+#SBATCH --job-name=randomise
+#SBATCH -c 1
+#SBATCH --time=24:30:00
+#SBATCH --mem-per-cpu=8gb
+
+cd /rigel/psych/users/cmh2228/SB/TBSS/stats
+
+randomise -i all_FA_skeletonised.nii.gz -o tbss_FA_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.con --T2 -c 3.1 -n 5000
