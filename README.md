@@ -6,7 +6,7 @@ SB DTI Pipeline
 ## Creating DTI folders and Converting dicoms to NIfti 
 
 ```.bash 
-#use foreach n (SB002_fu2 SB018_fu2 SB019_fu2…) from line 3 of subjects 
+#use foreach n (SB002_fu2 SB018_fu2 SB019_fu2…) from line 3 of subjects (all subjects)
 
 cd /danl/SB/${n}/anatomical/PING_30DIR_LONGTR_4/
 
@@ -36,19 +36,19 @@ bet ${n}_b0_AP ${n}_brain -m -f 0.3
 eddy --imain=${n}_dwi.nii.gz --mask=${n}_brain_mask.nii.gz --index=/danl/SB/DTI/index.txt --acqp=/danl/SB/DTI/acqparams.txt --bvec=${n}_bvecs --bvals=${n}_bvals /
 --fwhm=0 --flm=quadratic --dont_peas --repol --out=${n}_eddy
 
-#IF running on habanero 
-for i in SB*; do sbatch eddy_opemp_batch.sh $n; done 
+#IF running on habanero cd /rigel/psych/users/cmh2228/SB
+for i in SB*; do sbatch habanero/0.0eddy_opemp_batch.sh $n; done 
 
 #This script rungs: eddy_openmp --imain=${n}_dwi.nii.gz --mask=${n}_brain_mask.nii.gz --index=/danl/SB/DTI/index.txt --acqp=/danl/SB/DTI/acqparams.txt --bvec=${n}_bvecs --bvals=${n}_bvals /
 --fwhm=0 --flm=quadratic --dont_peas --repol --out=${n}_eddy
 ```
 
 ## Checking for motion 
-
+on lux 
 ```.R
-Rscript /scripts/motion_assess/extractingRMS.R 
-Rscript /scripts/motion_assess/extractingOutlierData.R 
-Rscript /scripts/motion_assess/extractingVolTransRotData.R 
+Rscript scripts/motion_assess/extractingRMS.R 
+Rscript scripts/motion_assess/extractingOutlierData.R 
+Rscript scripts/motion_assess/extractingVolTransRotData.R 
 ```
 
 ## Fitting tensors 
@@ -59,48 +59,53 @@ dtifit -k eddy_unwarped_images -m hifi_nodif_brain_mask -r bvecs -b bvals -o dti
 
 ```
 
-##check for motion 
-
 
 ## TBSS 
 run on habanero 
 
 ```.bash
 
-for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch 0.prepare_tbss_folder $n; done
+for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch habanero/0.1prepare_tbss_folder $n; done
 #This script creates one folder with all _dti_FA.nii.gz files and renames them to order by group (COMP/PI)
 
+#Do the same for MD, L1(AD), L2 & L2 (RD) 
+for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch habanero/0.1b_prepare_tbss_folders_nonFA $n; done
+
+
 cd /TBSS
-sbatch 1.tbss_1_preproc 
+sbatch 1.1tbss_1_preproc 
 #This script runs: tbss_1_preproc *nii.gz
 
-sbatch 2.tbss_2_reg
+sbatch habanero/2.1tbss_2_reg
 #This script runs: tbss_2_reg -T
 
-sbatch 3.tbss_3_postreg 
+sbatch habanero/3.1tbss_3_postreg 
 #This script runs: tbss_3_postreg -S
 
-sbatch 4.tbss_4_prestats
+sbatch habanero/4.1tbss_4_prestats
 #This script runs: tbss_4_prestats 0.2
 
  ```
  # For running with all subjects 
  ```.bash
 
-for n in *copy list of subjects from subjects line 8 #TBSS Long*; do sbatch 0.prepare_tbss_folder $n; done
+for n in *copy list of subjects from subjects line 8 #TBSS Long*; do sbatch 0.prepare_tbss_folder_long $n; done
 #This script creates one folder with all _dti_FA.nii.gz files and renames them to order by group (COMP/PI)
 
+#Do the same for MD, L1(AD), L2 & L2 (RD) 
+for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch habanero/0.1b_prepare_tbss_folders_nonFA_long $n; done
+
 cp TBSS/ TBSS_long
-sbatch 1.tbss_1_preproc_long 
+sbatch habanero/1.1b_tbss_1_preproc_long 
 #This script runs: tbss_1_preproc *nii.gz
 
-sbatch 2.tbss_2_reg_long
+sbatch habanero/2.1b_tbss_2_reg_long
 #This script runs: tbss_2_reg -T
 
-sbatch 3.tbss_3_postreg_long 
+sbatch habanero/3.1b_tbss_3_postreg_long 
 #This script runs: tbss_3_postreg -S
 
-sbatch 4.tbss_4_prestats_long
+sbatch habanero/4.1b_tbss_4_prestats_long
 #This script runs: tbss_4_prestats 0.2
 
  ```
@@ -110,38 +115,38 @@ sbatch 4.tbss_4_prestats_long
 ```.bash
 #Moving folders and renaming 
 mkdir /rigel/psych/users/cmh2228/SB/TBSS/MD
-for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch 0.prepare_tbss_folders $n; done
+for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch 0.1b_prepare_tbss_folders_nonFA $n; done
 #This script moves subjects _dti_MD.nii.gz files and renames them _dti_FA.nii.gz for running tbss_non_FA MD
 #Running tbss 
-sbatch 5.tbss_non_FA
+sbatch 5.1tbss_non_FA
 
 
 
 #for longidutinal set 
-for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch 0.prepare_tbss_folders_nonFA_long $n; done
-sbatch 5.tbss_non_FA_long
+for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch 0.1b_prepare_tbss_folders_nonFA_long $n; done
+sbatch habanero/5.1b_tbss_non_FA_long
 ```
 
 
 ## run bedpostx 
 
 ```.bash
-for n in SB*; do sbatch 0.prepare_bedpostx_folders $n; done 
+for n in SB*; do sbatch habanero/0.2prepare_bedpostx_folders $n; done 
 
-for n in SB*; do sbatch 1.bedpostx $n; done
+for n in SB*; do sbatch habanero/1.2bedpostx $n; done
 #This script runs: bedpostx ${n}
 ```
 
 ## subject registration
 ```.bash
-for n in SB*; do sbatch 3.registration $n; done 
+for n in SB*; do sbatch habanero/3.2registration $n; done 
 
 ```
 
 ## run probpostx 
 Using amydala as a seed 
 ```.bash
-for n in SB*; do sbatch 4.probtrackxAmygSeed.sh $n; done 
+for n in SB*; do sbatch habanero/4.2probtrackxAmygSeed.sh $n; done 
 
 ```
 
@@ -151,14 +156,16 @@ Run autoptx on habanero becuase takes a long time. Then copy to lux to run visua
 ```.bash
 #HABANERO
 #prepare autoptx folder 
-for n in SB*; do sbatch 0.prepare_autoptx_folders $n ; done
-
-cd /rigel/psych/users/cmh2228/SB/DTI/autoptx
-for n in SB*; do sbatch autoptx1.sh $n; done 
+for n in SB*; do sbatch habanero/0.3prepare_autoptx_folders $n ; done
 
 #This script runs: autoPtx_1_preproc ${n} and then: autoPtx_2_launchTractography 
+cd /rigel/psych/users/cmh2228/SB/autoptx
+for n in SB*; do sbatch habanero/1.3autoPtx_1.sh $n; done 
+for n in SB*; do sbatch habanero/2.3autoPtx_2.sh $n; done 
 
-#done for "ar_l", "ar_r", "atr_l", "atr_r", "cgc_l", "cgc_r", "cgh_l", "cgh_r", "ifo_l", "ifo_r", "ilf_l", "ilf_r", "ptr_l", "ptr_r", "slf_l", "slf_r", "str_r", "str_l", "unc_l", "unc_r"
+
+#done for "ar_l", "ar_r", "atr_l", "atr_r", "cgc_l", "cgc_r", "cgh_l", "cgh_r", "ifo_l", "ifo_r", "ilf_l", "ilf_r", "ptr_l", "ptr_r", "slf_l", "slf_r", "str_r", "str_l", "unc_l", "unc_r" #ammended /rigel/psych/app/autoPtx/structureList
+
 #Copy back to lux 
 
 #For everything:
@@ -178,10 +185,10 @@ autoPtx_prepareForDisplay 0.005
 #This uses structureList from /usr/share/fs/5.0/bin/autoPtx/structureList and subjectList from /danl/SB/DTI/autoptx/preproc/subjectList
 
 #Extract all values for FA MD AD and RD from tracts created by autoptx 
-./danl/SB/DTI/scripts/autoptx/1.1extractAllValues.sh
+./danl/SB/DTI/scripts/autoptx/6.1extractAllValues.sh
 
 #Make a spreadsheet of all subjects values - uses subjectList.txt and tractList.txt from autoptx/preproc/ folder 
-Rscript 1.2extractingAllValues.R 
+Rscript 6.2extractingAllValues.R 
 
 ```
 
@@ -214,7 +221,7 @@ All TBSS redone Jan 2019 using updated pipeline (Changed: Covaraiates file and I
 Using list of subject IDs - merge with full data set in this script 
 ```{r}
 rstudio ~/Columbia/danlab/DTI/data/makingCovariatesFileLong01.28.2019 #this does both cross-sectional and all data points 
-#output files 1. cross_covarites.txt 2. cross_covariates_GroupXAge01.29.2019.txt
+#output files 1.) cross_covarites.txt 2.) cross_covariates_GroupXAge01.29.2019.txt
 ```
 
 # Creating glm files to run 
@@ -298,23 +305,37 @@ Run GLM model *done on habanero for speed*
 #Can start with 500 instead of 5000 to see if it works correctly
 #DO this for all contrasts e.g. 
 
-randomise -i all_FA_skeletonised.nii.gz -o tbss_FA_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000  #see script 6.randomise.cross 
+#Copy from lux to habanero: on habanero: 
+scp charmon@lux.psych.columbia.edu:/danl/SB/DTI/TBSS_cross_01.29.2019/cross* /rigel/psych/users/cmh2228/SB/TBSS/stats/
+
+randomise -i all_FA_skeletonised.nii.gz -o tbss_FA_AgeEffect -m mean_FA_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000  #see script 6.1randomise.cross 
 
 #also do this for MD, AD, RD e.g.
-randomise -i all_MD_skeletonised.nii.gz -o tbss_MD_geEffect -m mean_MD_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000 #see script 6.randomise.cross_MD 
+randomise -i all_MD_skeletonised.nii.gz -o tbss_MD_geEffect -m mean_MD_skeleton_mask.nii.gz -d cross_ageEffect.mat -t cross_ageEffect.com --T2 -c 3.1 -n 5000 #see script: sbatch habanero/6.1b_randomise_cross_MD; sbatch habanero/6.1b_randomise.cross_AD;
 
-#For RD, before running randomise combine L2 and L3 - can be found in 5.5combineRD on habanero 
-fslmaths all_L2.nii.gz -add all_L3.nii.gz -div 2 all_RD.nii.gz #or on habanero run: sbatch 6.randomise_cross_RD 
+#For RD, before running randomise combine L2 and L3 - can be found in 5.2combineRD on habanero 
+fslmaths all_L2.nii.gz -add all_L3.nii.gz -div 2 all_RD.nii.gz #and then on habanero run: sbatch habanero/6.1b_randomise_cross_RD 
 ```
+
 Interactions: 
 ```.bash
 
-randomise -i all_FA_skeletonised.nii.gz -o tbss_ageInteraction -m mean_FA_skeleton_mask.nii.gz -d cross_ageInteraction.mat -t cross_ageInteraction.com --T2 -c 3.1 -n 5000
+randomise -i all_FA_skeletonised.nii.gz -o tbss_ageInteraction -m mean_FA_skeleton_mask.nii.gz -d cross_ageInteraction.mat -t cross_ageInteraction.com --T2 -c 3.1 -n 5000 #on habanero: sbatch habanero/6.2randomise_cross_Interaction
+
+#Do for MD, AD, RD 
+sbatch habanero/6.2b_randomise_cross_Interaction_MD
+sbatch habanero/6.2b_randomise_cross_Interaction_AD
+sbatch habanero/6.2b_randomise_cross_Interaction_RD
+
 ```
 
 copy outputs to lux 
 to view: 
 ```.bash
+#on lux  cd /danl/SB/DTI/TBSS_cross_01.29.2019
+scp cmh2228@habanero.rcs.columbia.edu:/rigel/psych/users/cmh2228/SB/TBSS/cross* . 
+scp cmh2228@habanero.rcs.columbia.edu:/rigel/psych/users/cmh2228/SB/TBSS/all* . 
+
 fslview $FSLDIR/data/standard/MNI152_T1_1mm mean_FA_skeleton -l Green -b 0.2,0.7 tbss_tfce_corrp_tstat1 -l Red-Yellow -b 0.95,1
 ```
 
