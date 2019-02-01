@@ -9,6 +9,6 @@ export PATH=$PATH:/rigel/psych/users/cmh2228/SB/autoPtx
 
 n=$1
 
-#/rigel/psych/users/cmh2228/SB/autoptx/autoPtx/autoPtx_1_preproc ${n}
+/rigel/psych/users/cmh2228/SB/autoptx/autoPtx/autoPtx_1_preproc ${n}
 autoPtx_2_launchTractographySubList${n}
 
