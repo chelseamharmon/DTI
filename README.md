@@ -160,11 +160,12 @@ for n in SB*; do sbatch habanero/0.3prepare_autoptx_folders $n ; done
 
 #This script runs: autoPtx_1_preproc ${n} and then: autoPtx_2_launchTractography 
 cd /rigel/psych/users/cmh2228/SB/autoptx
-for n in SB*; do sbatch habanero/1.3autoPtx_1.sh $n; done 
-for n in SB*; do sbatch habanero/2.3autoPtx_2.sh $n; done 
+for n in *use subjects autoPtx did not work*; do sbatch habanero/1.3autoPtx_1.sh $n; done 
+sbatch habanero/2.3autoPtx_2.sh 
 
 
 #done for "ar_l", "ar_r", "atr_l", "atr_r", "cgc_l", "cgc_r", "cgh_l", "cgh_r", "ifo_l", "ifo_r", "ilf_l", "ilf_r", "ptr_l", "ptr_r", "slf_l", "slf_r", "str_r", "str_l", "unc_l", "unc_r" #ammended /rigel/psych/app/autoPtx/structureList
+#To do 02/2019 "ar_l", "ar_r", "cst_l", "cst_r", "fma", "fmi", "mcp", "ml_l", "ml_r" in autoptx_07.2019
 
 #Copy back to lux 
 
@@ -175,9 +176,10 @@ scp -r autoptx/* charmon@lux.psych.columbia.edu:/danl/SB/DTT/
 #For just indiviudal tracts 
 cd /rigel/psych/users/cmh2228/DTI/autoptx
 for n in SB*; do scp -r $n/str_? charmon@lux.psych.columbia.edu:/danl/SB/DTI/autoptx/tracts/$n
+```
 
-
-#LUX
+#LUX thresholding 
+```.bash
 #Creates .nii.gz using tractsNorm.nii.gz file for each tract in autoptx/visualise/ folder 
 #Use edited autoPtx_prepareForDisplay file which can be found in this repository under /scripts/autoptx/
 cd /danl/SB/DTI/autoptx
@@ -194,9 +196,8 @@ Rscript 6.2extractingAllValues.R
 
 ## Assessing motion outliers 
 
-
+# Calculating Total Motion Index
 ```.R
-#Total Motion Index
 
 #Average volume by volume translation and rotation 
 Rscript /danl/SB/DTI/scripts/motion_assess/extractingVolTransRotData.R
@@ -206,9 +207,13 @@ Rscript /danl/SB/DTI/scripts/motion_assess/extractingOutlierData.R
 
 #Severity of outlier slices 
 Rscript /danl/SB/DTI/scripts/motion_assess/extractingOutlierSeverity.R
+```
 
+# Calculating Framewise displacement (matlab)
+```.matlab
 
 ```
+
 
 # Analyses
 
@@ -335,29 +340,36 @@ to view:
 #on lux  cd /danl/SB/DTI/TBSS_cross_01.29.2019
 scp cmh2228@habanero.rcs.columbia.edu:/rigel/psych/users/cmh2228/SB/TBSS/cross* . 
 scp cmh2228@habanero.rcs.columbia.edu:/rigel/psych/users/cmh2228/SB/TBSS/all* . 
-
-fslview $FSLDIR/data/standard/MNI152_T1_1mm mean_FA_skeleton -l Green -b 0.2,0.7 tbss_tfce_corrp_tstat1 -l Red-Yellow -b 0.95,1
 ```
 
 Extracting results 
 
 ```.bash
-fslmaths tbss_ageEffects_clustere_corrp_tstat1.nii.gz -thr 0.95 -bin significant_results_mask1
-fslmeants -i all_FA_skeletonised.nii.gz -m significant_results_mask1.nii.g -o avg_tstat1.txt
-tbss_fill tbss_ageEffect_clustere_corrp_tstat1.nii.gz 0.949 mean_FA tbss_ageEffect_clustere_corrp_tstat1_filled #For visualizing ONLY (min/max display range should be set to .95/1.0 to show p<0.05
+fslmaths tbss_FA_AgeEffect_clustere_corrp_tstat1.nii.gz -thr 0.95 -bin significant_FA_AgeEffect_results_mask1
+fslmeants -i all_FA_skeletonised.nii.gz -m significant_FA_AgeEffect_results_mask1.nii.gz -o avg_FA_tstat1.txt
+tbss_fill tbss_FA_AgeEffect_clustere_corrp_tstat1.nii.gz 0.949 mean_FA tbss_FA_AgeEffects_clustere_corrp_tstat1_filled #For visualizing ONLY (min/max display range should be set to .95/1.0 to show p<0.05
 ```
 
 For reporting cluster results 
 
 ```.bash
-cluster -i tbss_ageInt_tfce_corrp_tstat.nii.gz -t 0.95 -c tbss_ageInt_tstat.nii.gz --scalarname="1-p">cluster_corrp1.txt 
-#or:
-#cluster -i tbss_ageEffect_tfce_corrp -t 0.95 --oindex cluster_ageEffect2_index -c tbss_ageEffect_tstat2
+cluster -i tbss_FA_AgeEffect_tfce_corrp_tstat1.nii.gz -t 0.95 -c tbss_FA_AgeEffect_tstat1.nii.gz --scalarname="1-p">cluster_FA_corrp1.txt 
 
-fslmaths -dt int cluster_index -thr 1 -uthr 1 -bin cluster_mask1
+#Old 
+#cluster -i tbss_ageInt_tfce_corrp_tstat.nii.gz -t 0.95 -c tbss_ageInt_tstat.nii.gz --scalarname="1-p">cluster_corrp1.txt 
+##or:
+##cluster -i tbss_ageEffect_tfce_corrp -t 0.95 --oindex cluster_ageEffect2_index -c tbss_ageEffect_tstat2
+
+#fslmaths -dt int cluster_index -thr 1 -uthr 1 -bin cluster_mask1
 ```
 
 ```.bash
+atlasq list
+atlasq query jhu-labels -c 127 102 68
+atlasq query jhu-tracts -c 127 102 68
+
+
+#OLD
 atlasquery --dumpatlases #Gives you atlases to choose from, e.g. atlasquery [-a "<atlasname>"] [-c <x>, <y>, <z>]
 #e.g.: 
 atlasquery -a "JHU White-Matter Tractography Atlas" -c -37 4 -30
