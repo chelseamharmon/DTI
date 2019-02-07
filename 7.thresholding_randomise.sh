@@ -1,5 +1,7 @@
 #!/bin/tcsh
 
+cd /danl/SB/DTI/TBSS_cross_01.29.2019
+
 #FA Age Effects COPE 1 
 #1. Thresholding
 fslmaths tbss_FA_AgeEffect_clustere_corrp_tstat1.nii.gz -thr 0.95 -bin significant_FA_AgeEffect_results_mask1
