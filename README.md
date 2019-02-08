@@ -364,6 +364,9 @@ cluster -i tbss_FA_AgeEffect_tfce_corrp_tstat1.nii.gz -t 0.95 -c tbss_FA_AgeEffe
 ```
 
 ```.bash
+8.extractingLocationInfo.R
+
+#Script above Performs for cluster outputs: 
 atlasq list
 atlasq query jhu-labels -c 127 102 68
 atlasq query jhu-tracts -c 127 102 68
