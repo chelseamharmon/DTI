@@ -378,6 +378,39 @@ atlasquery --dumpatlases #Gives you atlases to choose from, e.g. atlasquery [-a 
 atlasquery -a "JHU White-Matter Tractography Atlas" -c -37 4 -30
 ```
 
+Viewing results 
+
+```.bash
+
+fsleyes tbss_FA_AgeEffect_clustere_corrp_tstat2_filled.nii.gz FMRIB58_FA_1mm
+Settings > Ortho View 1 > (check) Atlas Panal > (check both) JHU ICBM & JHU White-Mater
+
+```
+
+## Looking for outputs?? 
+
+```.bash
+#inputs 
+tbss_FA_AgeEffect_clustere_corrp_tstat2.nii.gz  #Cluster-wise (Extent) randomise output  ; 1-FWE-Corrected P 
+			#"FWE-corrected" means that the family-wise error rate is controlled. If only FWE-corrected P-values less than 0.05 are accepted, the chance of one more false positives occurring over all space is no more than 5%. Equivalently, one has 95% confidence of no false positives in the image. Thus to "threshold at p<0.01", threshold the output images at 0.99 etc.
+			#When viewing the 1-p results in FSLView the min/max display range should be set to 0.95/1.0 so that values less than 0.95 (equivalent to p>0.05) are not shown. If these are corrected values (i.e. corrp) then the visible areas correspond to the statistically significant regions.
+
+
+
+all_FA_skeletonised.nii.gz
+significant_FA_AgeEffect_results_mask2.nii.gz
+mean_FA
+tbss_FA_AgeEffect_tfce_corrp_tstat2
+
+
+#outputs
+cluster1_ageEffect2_FAvalue.txt 
+avg_FA_tstat2.txt
+significant_FA_AgeEffect_results_mask2
+tbss_FA_AgeEffect_clustere_corrp_tstat2_filled
+
+```
+
 Extracting values from masks to get longitudinal info 
 
 ```.bash
