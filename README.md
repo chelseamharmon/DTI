@@ -217,7 +217,7 @@ Rscript /danl/SB/DTI/scripts/motion_assess/extractingOutlierSeverity.R
 
 # Analyses
 
-## Analyses Jan.2018  TBSS Cluster Analyses - 
+## Analyses Jan.2018  TBSS Cluster Analyses - TIMEPOINT 1 ONLY
 These were done incorrectly - with COMP and PI switched - find in folder TBSS_cross_no64_motionExcluded.Jan2018/
 All TBSS redone Jan 2019 using updated pipeline (Changed: Covaraiates file and Interaction model to include main effects)
 - find on Habanero TBSS/ 
@@ -416,6 +416,51 @@ Extracting values from masks to get longitudinal info
 ```.bash
 fslmeants -i all_FA_skeletonised -m cluster_ageEffect2_mask1 -o cluster1_ageEffect2_FAvalue.txt 
 ```
+
+
+## Analyses Jan.2018  TBSS Cluster Analyses - with 2 data points per subject (no missing data allowed according to FSL Glm) - modelling longidutinally. 
+ANOVA: 2 groups, 2 levels per subject (2 way mixed effects ANOVA). 
+Number of EVS = # of subjects (150) + 2 
+```.bash
+2 group design 
+EV1: Code 0 for COMP & 1 for PI (GROUP.PI) 
+EV2: Code 1 for COMP & 0 for PI (GROUP.COMP)
+EV3: Subject 1 
+EV4: Subject 2 
+EV5: Subject 3 
+.
+.
+.
+		EV1		EV2 		EV3	EV4	EV5		
+Group		Timepoint	GroupXTimepoint	Sub1(C)	Sub2(C)	Sub3(PI)
+1	 	-1		-1		1	0	0
+1		1		1		1	0	0
+1		-1		-1		0	1	0
+1		1		1		0	1	0
+1		-1		1		0	0	1	
+1		1		-1		0	0	1
+```
+```.bash
+Glm &
+```
+Higher Level/non-timeseries design
+#inputs = 150
+```
+wizard 
+	2 groups unpaired 
+	#of subjects in first group = 82
+	process 
+	paste 
+contrasts 2 
+
+Number of main EVs 152
+		
+			EV1	EV2 		
+C1 TimepointEffect  	1	0			
+C2 Interaction		0	1			
+
+```
+save *long_ANOVA.fsf
 
 
 ## Analyses Jan.2019 TBSS Cluster with all data points (not modelling longitudinally) 
