@@ -159,13 +159,16 @@ Run autoptx on habanero becuase takes a long time. Then copy to lux to run visua
 for n in SB*; do sbatch habanero/0.3prepare_autoptx_folders $n ; done
 
 #This script runs: autoPtx_1_preproc ${n} and then: autoPtx_2_launchTractography 
-cd /rigel/psych/users/cmh2228/SB/autoptx
-for n in *use subjects autoPtx did not work*; do sbatch habanero/1.3autoPtx_1.sh $n; done 
+
+cd /rigel/psych/users/cmh2228/SB/autoptx #it is found named /rigel/psych/users/cmh2228/SB/autoptx/autoptx1.sh
+#for n in *use subjects autoPtx did not work*; do sbatch habanero/1.3autoPtx_1.sh $n; done 
 sbatch habanero/2.3autoPtx_2.sh 
 
 
-#done for "ar_l", "ar_r", "atr_l", "atr_r", "cgc_l", "cgc_r", "cgh_l", "cgh_r", "ifo_l", "ifo_r", "ilf_l", "ilf_r", "ptr_l", "ptr_r", "slf_l", "slf_r", "str_r", "str_l", "unc_l", "unc_r" #ammended /rigel/psych/app/autoPtx/structureList
+#done for "ar_l", "ar_r", "atr_l", "atr_r", "cgc_l", "cgc_r", "cgh_l", "cgh_r", "ifo_l", "ifo_r", "ilf_l", "ilf_r", "ptr_l", "ptr_r", "slf_l", "slf_r", "str_r", "str_l", "unc_l", "unc_r" 
+#ammended /rigel/psych/app/autoPtx/structureList
 #To do 02/2019 "ar_l", "ar_r", "cst_l", "cst_r", "fma", "fmi", "mcp", "ml_l", "ml_r" in autoptx_07.2019
+#In order to change which tracts are run edit /rigel/psych/app/autoPtx structureList ; structureListALL has all tracts 
 
 #Copy back to lux 
 
