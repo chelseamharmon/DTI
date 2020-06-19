@@ -66,8 +66,8 @@ fslmeants -i dti_MD.nii.gz -m ptr_r_tract_MD.nii.gz -o ptr_r_MD.txt
 fslmeants -i dti_MD.nii.gz -m slf_l_tract_MD.nii.gz -o slf_l_MD.txt
 fslmeants -i dti_MD.nii.gz -m slf_r_tract_MD.nii.gz -o slf_r_MD.txt
 
-#fslmeants -i dti_MD.nii.gz -m str_l_tract_MD.nii.gz -o str_l_MD.txt
-#fslmeants -i dti_MD.nii.gz -m str_r_tract_MD.nii.gz -o str_r_MD.txt
+fslmeants -i dti_MD.nii.gz -m str_l_tract_MD.nii.gz -o str_l_MD.txt
+fslmeants -i dti_MD.nii.gz -m str_r_tract_MD.nii.gz -o str_r_MD.txt
 
 fslmeants -i dti_MD.nii.gz -m unc_l_tract_MD.nii.gz -o unc_l_MD.txt
 fslmeants -i dti_MD.nii.gz -m unc_r_tract_MD.nii.gz -o unc_r_MD.txt
@@ -111,8 +111,8 @@ fslmaths -dt input cgc_r_tract_L2.nii.gz -add cgc_r_tract_L3.nii.gz -div 2 cgc_r
 fslmaths -dt input cgh_l_tract_L2.nii.gz -add cgh_l_tract_L3.nii.gz -div 2 cgh_l_tract_RD.nii.gz
 fslmaths -dt input cgh_r_tract_L2.nii.gz -add cgh_r_tract_L3.nii.gz -div 2 cgh_r_tract_RD.nii.gz
 
-fslmeants -dt input ifo_l_tract_L2.nii.gz -add ifo_l_tract_L3.nii.gz -div 2 ifo_l_tract_RD.nii.gz
-fslmeants -dt input ifo_r_tract_L2.nii.gz -add ifo_r_tract_L3.nii.gz -div 2 ifo_r_tract_RD.nii.gz
+fslmaths -dt input ifo_l_tract_L2.nii.gz -add ifo_l_tract_L3.nii.gz -div 2 ifo_l_tract_RD.nii.gz
+fslmaths -dt input ifo_r_tract_L2.nii.gz -add ifo_r_tract_L3.nii.gz -div 2 ifo_r_tract_RD.nii.gz
 
 fslmaths -dt input ilf_l_tract_L2.nii.gz -add ilf_l_tract_L3.nii.gz -div 2 ilf_l_tract_RD.nii.gz
 fslmaths -dt input ilf_r_tract_L2.nii.gz -add ilf_r_tract_L3.nii.gz -div 2 ilf_r_tract_RD.nii.gz
