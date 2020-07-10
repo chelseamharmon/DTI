@@ -117,7 +117,7 @@ sbatch habanero/4.1b_tbss_4_prestats_long
 mkdir /rigel/psych/users/cmh2228/SB/TBSS/MD
 for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch 0.1b_prepare_tbss_folders_nonFA $n; done
 #This script moves subjects _dti_MD.nii.gz files and renames them _dti_FA.nii.gz for running tbss_non_FA MD
-#Running tbss 
+#Running tbss_non_FA <- uses images in FA folder to register too, make sure that subject list is the same as what is in the MD/L1/L2/L3 folder 
 sbatch 5.1tbss_non_FA
 
 
@@ -125,8 +125,23 @@ sbatch 5.1tbss_non_FA
 #for longidutinal set 
 for n in *copy list of subjects from subjects line 8 #TBSS cross*; do sbatch 0.1b_prepare_tbss_folders_nonFA_long $n; done
 sbatch habanero/5.1b_tbss_non_FA_long
+
+#Combine L2 and L3 to create RD 
+fslmaths all_L2.nii.gz -add all_L3.nii.gz -div 2 all_RD.nii.gz #and then on habanero run: sbatch habanero/6.1b_randomise_cross_RD 
 ```
 
+## Using masks for tracts FA, MD, AD, RD 
+# Note on folders 
+TBSS_all <- made Sept 2017 has all data including 64 direction data and 400 group, tbss_non_FA MD L1 L2 L3 ran on danl 
+TSS_all_longitudinal_no64_no400 <- the above folder copy and pasted with deleting the files from 64 dir list and 4* then reran tbss_3_postreg -S (creating new skeleton of mean data) and tbss_4_prestats 0.2 then tbss_non_FA MD L1 L2 L3 
+TBSS_all_no64Nov2017 <- all tbss steps ran on habanero with this subject list. Except tbss_non_FA MD L1 L2 L3 which was ran on danl
+
+```.bash
+
+
+fslmeants -i all_FA_skeletonised.nii.gz -m [mask].nii.gz -o [mask]_FA.txt
+
+```
 
 ## run bedpostx 
 
